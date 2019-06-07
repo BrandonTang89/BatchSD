@@ -19,10 +19,11 @@ More detailed instructions are found in "readme.txt" which is shown at the botto
 ## About and Technical Details
 This programme was jointly developed by Brandon Tang and Reiden Ong to enable the masses to more conveniently download songs from youtube. It relies on the pytube API and uses FFMPEG to convert the downloaded MP4 files into MP3 format.
 
-### Installing Dependencies (if running the source "BatchSD_Final.py" file and or building from source)
+### Installing Dependencies (if running the source "BatchSD_Final.py" file and/or building from source)
 - Install python 3.7+ from "https://www.python.org/"
 - Install python libraries using
 <pre>pip install bs4 pytube ffmpy3 virtualenv pyinstaller</pre>
+- Go into the ffmpeg folder, run "install ffmpeg.cmd"
 
 ### Building from Source
 - Clone the repo
