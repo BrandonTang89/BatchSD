@@ -16,21 +16,21 @@ More detailed instructions are found in "readme.txt" which is shown at the botto
 3. Run "-- Click to Setup --.cmd"
 4. Double click on "BatchSD_Final.exe"
 
-## About
+## About and Technical Details
 This programme was jointly developed by Brandon Tang and Reiden Ong to enable the masses to more conveniently download songs from youtube. It relies on the pytube API and uses FFMPEG to convert the downloaded MP4 files into MP3 format.
 
-Installing Dependencies (if running the source "BatchSD_Final.py" file and or building from source)
+### Installing Dependencies (if running the source "BatchSD_Final.py" file and or building from source)
 - Install python 3.7+ from "https://www.python.org/"
 - Install python libraries using
 <pre>pip install bs4 pytube ffmpy3 virtualenv pyinstaller</pre>
 
-Building from Source
+### Building from Source
 - Clone the repo
 - Make whatever edits required
 - Run build.cmd which activates a virtual environement (in mypython) and runs pyinstaller
 
 
-##Detailed Instructions
+## Detailed Instructions
 <pre>
 ______       _       _       ___________ 
 | ___ \     | |     | |     /  ___|  _  \
