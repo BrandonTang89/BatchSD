@@ -49,12 +49,6 @@ Hope you find it useful!!!
 Regards,
 RD and BT
 
-*************************************************************************************************
-SETUP                                      
-1. click on setup.cmd 
-	 - this sets up a mp3 converter                                         
-2. That's it. ezpz.
-
 **************************************************************************************************
 USAGE
 The main program is in BatchSD.exe, so just click on it (it may take a while to load)
