@@ -93,6 +93,11 @@ ANS: We source from a giant music repository, so you may want to narrow your sea
 Is there support for chinese songs?
 ANS: yes. BatchSD should work for all languages. very cool.
 
+What is up with the random "403" Errors?
+ANS: Youtube doesn't really like people downloading videos from their site, hence there is a cap on the number of videos one is able to download per unit time. "403" error just means that youtube is blocking the downloads, however BatchSD tries to deal with this by skipping that video and remembering to come back to download it. 
+
+TLDR, don't worry, if you leave batchSD running long enough, all the songs will eventually be downloaded.
+
 Is this Piracy?
 ANS: nawwwwwhhhhhhhh thats uber lame and BatchSD is very cool so we dont do that here.
 
