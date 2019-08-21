@@ -1,6 +1,8 @@
 # BatchSD (Batch Song Downloader)
 A "SuperLight" song downloader that downloads music from youtube in bulk.
 
+**Due to YouTube reworking its website, this programme does not currently work, I'll fix it when I have the chance**
+
 ### Basic Usage
 The list of songs can be inputted in 4 different ways
 1. Spotify: Provide a spotify playlist URL (however only downloads the first 30 :( )
