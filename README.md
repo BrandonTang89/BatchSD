@@ -1,7 +1,7 @@
 # BatchSD (Batch Song Downloader)
 A "SuperLight" song downloader that downloads music from youtube in bulk.
 
-** Note: for this to work, ensure you have `pytube3` installed on your system and not `pytube`**
+**Note: for this to work, ensure you have `pytube3` installed on your system and not `pytube`**
 
 ### Basic Usage
 The list of songs can be inputted in 4 different ways
@@ -17,9 +17,10 @@ This programme was jointly developed by Brandon Tang and Reiden Ong to enable th
 
 ### Installing Dependencies
 - Install python 3.7+ from "https://www.python.org/"
-- Install python libraries using pip3 (on Linux systems)
-<pre>pip3 install -r requirements.txt"
+- Install python libraries using pip3 (on Linux systems) or pip (Windows systems)
+<pre>pip3 install -r requirements.txt"</pre>
 - Install ffmpeg
+
 [Linux - apt Package Manager]
 <pre>
 sudo apt update
