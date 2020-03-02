@@ -4,6 +4,9 @@ A "SuperLight" song downloader that downloads music from youtube in bulk.
 **Note: for this to work, ensure you have `pytube3` installed on your system and not `pytube`**
 
 ### Basic Usage
+- Run the compiled binaries of batchsd_ddmmyy.exe for windows or batchsd_ddmmyy for linux. OR
+- Run the python script BatchSD.py (see below for dependencies)
+
 The list of songs can be inputted in 4 different ways
 1. Spotify: Provide a spotify playlist URL (however only downloads the first 30 :( )
 2. Youtube: Provide a youtube playlist URL
