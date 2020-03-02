@@ -1,7 +1,7 @@
 # BatchSD (Batch Song Downloader)
 A "SuperLight" song downloader that downloads music from youtube in bulk.
 
-**Due to YouTube reworking its website, this programme does not currently work, I'll fix it when I have the chance**
+** Note: for this to work, ensure you have `pytube3` installed on your system and not `pytube`**
 
 ### Basic Usage
 The list of songs can be inputted in 4 different ways
@@ -12,26 +12,24 @@ The list of songs can be inputted in 4 different ways
 
 More detailed instructions are found in "readme.txt" which is shown at the bottom of the page
 
-## Set-Up and Install
-1. Download the "BatchSD_SETUP.zip" from the releases section of this repository
-2. Extract the file
-3. Run "-- Click to Setup --.cmd"
-4. Double click on "BatchSD_Final.exe"
-
 ## About and Technical Details
-This programme was jointly developed by Brandon Tang and Reiden Ong to enable the masses to more conveniently download songs from youtube. It relies on the pytube API and uses FFMPEG to convert the downloaded MP4 files into MP3 format.
+This programme was jointly developed by Brandon Tang and Reiden Ong to enable the masses to more conveniently download songs from youtube. It relies on the pytube library and uses FFMPEG to convert the downloaded MP4 files into MP3 format.
 
-### Installing Dependencies (if running the source "BatchSD_Final.py" file and/or building from source)
+### Installing Dependencies
 - Install python 3.7+ from "https://www.python.org/"
-- Install python libraries using
-<pre>pip install bs4 pytube ffmpy3 virtualenv pyinstaller</pre>
-- Go into the ffmpeg folder, run "install ffmpeg.cmd"
-
-### Building from Source
-- Clone the repo
-- Make whatever edits required
-- Run build.cmd which activates a virtual environement (in mypython) and runs pyinstaller
-
+- Install python libraries using pip3 (on Linux systems)
+<pre>pip3 install -r requirements.txt"
+- Install ffmpeg
+[Linux - apt Package Manager]
+<pre>
+sudo apt update
+sudo apt-get install ffmpeg
+</pre>
+[Windows]
+<pre>
+cd FFmpeg_Windows
+'install ffmpeg.cmd'
+</pre>
 
 ## Detailed Instructions
 <pre>
@@ -69,6 +67,7 @@ Spotify
 
 .CSV
  - .csv is a file type which can be made using excel (comma delimited)
+ - Every line is a new song, the song title and artists are seperated by a comma (if editing manually on a text editor)
  - simply use our songs.csv template or make one of your own!
 
 YouTube Playlist
