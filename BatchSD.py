@@ -1,7 +1,7 @@
 import requests
 import urllib.request
 import time
-import csv, os, ffmpy3, shutil, sys
+import csv, os, ffmpy3, shutil, sys, progressbar
 from bs4 import BeautifulSoup
 from pytube import YouTube, Playlist
 vid_dir = "songs"
@@ -86,30 +86,44 @@ def yt_download(name):
     yt_url_download(urls[0], name=name)
 
 
+# --- Function to Download a Video URL ---
 failed_downloads =[]
 
-def yt_url_download(url, name=""):
-    global failed_downloads
-    start_time = time.time()
-    #print("URL: ", url)
-    try:
-        yt = YouTube(url)
-    except Exception as e:
-        print (e)
-        return 0
+# Helper Function for Progress Bar
+def progress_Check(stream = None, chunk = None, remaining = None):
+    #Gets the percentage of the file that has been downloaded.
+    percent = (100*(file_size-remaining))/file_size
+    bar.update(percent)
+    # print("{:00.0f}% downloaded".format(percent))
 
+
+def yt_url_download(url, name=""):
+    # Global Variables to Modify
+    global failed_downloads
+    global file_size # For Progress Bar
+    global bar       # For Progress Bar
+
+    start_time = time.time()
+    # print("URL: ", url)
+    yt = YouTube(url, on_progress_callback=progress_Check)
+
+    # Choosing Stream
     if (audio_only):
         stream = yt.streams.filter(only_audio=True).first()
     else:
-        stream = yt.streams.first()
+        stream = yt.streams.filter(progressive = True).first()
 
-    #NAMING
+    # Get setting up file size variable for progress bar
+    file_size = stream.filesize
+
+    # Check Custom Name Setting
     if not customname:
         name = ""
 
-    
-    success = False
-    for i in range(1):
+    # Downloading File
+    with progressbar.ProgressBar(max_value=100) as bar:
+        
+        success = False
         try:
             if name!="":
                 stream.download(vid_dir, filename=name) #save file as filename to specified dir
@@ -117,20 +131,18 @@ def yt_url_download(url, name=""):
                 stream.download(vid_dir)
 
             success= True
-            break
         except Exception as e:
-            print(e)
-            print("403 forbidden (probably), sleeping and trying again")
-            time.sleep(28.5)
-            pass
+            print("Error Downloading File")
+            print("Error: " + str(e))
+
+    # Collating Failed Videos to Try Again
     if not success:
         failed_downloads.append((url, name))
-    else:
-        print("Download Complete")
+
         
+    # Sleeping to Prevent Youtube Blockage
     time_taken = time.time() - start_time
     time_to_sleep = 10 - time_taken
-    #print("time to sleep:", time_to_sleep)
     if time_to_sleep > 0:
         time.sleep(time_to_sleep)
     
@@ -170,7 +182,7 @@ def download_fails_fn():
     print("Trying to Download Failed Files")
     for index, (url, name) in enumerate(failed_downloads):
         print(index+1, "/", len(failed_downloads))
-        yt_url_download(url)
+        yt_url_download(url,name)
     convert_vid_to_audio(vid_dir, audio_dir)
         
 
@@ -191,9 +203,9 @@ def presets():
     #Check if vid_dir exist
     try:
         os.mkdir(vid_dir) #create vid_dir if it doesnt already exist
-    except Exception as e:
-        #print (e)
+    except:
         pass
+
 presets()
 
 def settings():
@@ -227,8 +239,7 @@ def settings():
     #Check if vid_dir exist
     try:
         os.mkdir(vid_dir) #create vid_dir if it doesnt already exist
-    except Exception as e:
-        #print (e)
+    except:
         pass
 
     
