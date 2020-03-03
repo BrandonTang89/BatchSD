@@ -2,3 +2,4 @@ pytube3
 ffmpy3
 bs4
 requests
+progressbar2
