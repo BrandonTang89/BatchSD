@@ -134,6 +134,7 @@ def yt_url_download(url, name=""):
         except Exception as e:
             print("Error Downloading File")
             print("Error: " + str(e))
+            pass
 
     # Collating Failed Videos to Try Again
     if not success:
