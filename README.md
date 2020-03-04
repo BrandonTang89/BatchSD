@@ -4,6 +4,7 @@ A "SuperLight" song downloader that downloads music from youtube in bulk.
 **Note: for this to work, ensure you have `pytube3` installed on your system and not `pytube`**
 
 ### Basic Usage
+- Install ffmpeg on your system (either using FFmpeg_Windows\"install ffmpeg.cmd" or using a linux package manager)
 - Run the compiled binaries of batchsd_ddmmyy.exe for windows or batchsd_ddmmyy for linux. OR
 - Run the python script BatchSD.py (see below for dependencies)
 
