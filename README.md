@@ -83,7 +83,7 @@ What to do if the program crashes?
 ANS: close the .exe file and reopen it. if it dosen't work, try harder.
 
 Is there any concern with the large chunk of text that comes out after the Downloading complete sign comes?
-ANS: Nope. The text comes from running a 3rd party program which converts videos from nasty .mp4 to nice .mp3s
+ANS: Nope. The text comes from running a 3rd party program which converts videos from nasty .mp4 to nice .mp3s.
 
 Where do i find the songs?
 ANS: Go to the folder labelled "mp3"
@@ -104,6 +104,15 @@ ANS: Youtube doesn't really like people downloading videos from their site.
      However BatchSD tries to deal with this by skipping that video and remembering to come back to download it. 
 
      TLDR, don't worry, if you leave batchSD running long enough, all the songs will eventually be downloaded.
+
+What if my downloads die halfway or I want to stop because I need to do sth else.
+ANS: No worries, feel free to press the x on the window.
+     Next time you try downloading the same playlist or set of songs, BatchSD will automatically skip over any that have already been downloaded into the "songs" folder.
+
+My songs folder has many songs but my mp3 folder doesn't have anything, whats going on?
+ANS: You probably didn't let BatchSD convert the mp4 videos into mp3 songs yet. 
+     Its alright tho, just open BatchSD, press "a" and [enter]. 
+     BatchSD won't download anything but will still help convert the mp4s in the songs folder to mp3s.
 
 Is this Piracy?
 ANS: nawwwwwhhhhhhhh thats uber lame and BatchSD is very cool so we dont do that here.
