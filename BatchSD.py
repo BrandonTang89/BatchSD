@@ -312,7 +312,10 @@ def main():
 
         for i in range(n):
             name = input("Enter Song " + str(i) + ":")
-            names.append(name)
+            if name != "":
+                names.append(name)
+            else:
+                print("No Song Specified... (skipping)")
 
         adhoc_download(names)
 
