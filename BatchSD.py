@@ -165,13 +165,14 @@ def spotify_download(playlist_url):
     #print(playlist)
     cont = input("Continue? (y/n):  ")
     if (cont == "y"):
-        for song in playlist:
+        for index, song in enumerate(playlist):
             print("Song: ", song)
+            print(index+1, "/", len(playlist))
             yt_download(song)
 
         convert_vid_to_audio(vid_dir, audio_dir)
     else:
-        print ("")
+        print ("Aborted")
         main()
 
 def spotify_import(url):
