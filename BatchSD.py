@@ -1,7 +1,18 @@
-import requests
-import urllib.request
-import time
-import csv, os, ffmpy3, shutil, sys, progressbar
+############################################################################################################################################
+## BATCHSD CODE
+#   
+#   Structure of code
+#       - Imports and variable instantiation
+#       - Universal Youtube Download Functions
+#       - High level functions to handle different input
+#       - Post processing and other offline helpder functions
+#       - CLI and front-end functions
+#
+#############################################################################################################################################
+
+import os, sys, shutil, csv, time
+import requests, urllib.request
+import ffmpy3, progressbar
 from bs4 import BeautifulSoup
 from pytube import YouTube, Playlist
 vid_dir = "songs"
@@ -9,6 +20,7 @@ audio_dir = "mp3"
 audio_only = False
 download_fails = True
 customname = True
+failed_downloads =[]
 
 print(" ____        _       _     ____  ____ ")
 print("| __ )  __ _| |_ ___| |__ / ___||  _ \ ")
@@ -19,7 +31,149 @@ print("a *superlight* batch song downloader")
 print("by BT and RD")
 print("")
 
-############################################################################################################################################
+#############################################################################################################################################
+## UNIVERSAL DOWNLOAD FUNCTIONS
+#   
+#   yt_download("Song Name") --> 
+#       yt_query("Song Name") [Returns URL] 
+#       yt_ url_download("URL") [Downloads the video at "URL"] -->
+#           download_fails_fn() [Downloads Failed Videos (deprecated)]
+#
+#############################################################################################################################################
+# --- Download each video (with first result) ---
+def yt_download(name):
+
+    #Check if video already downloaded
+    if os.path.isfile(vid_dir+"/"+name+".mp4"):
+        print(name, "has already been downloaded, skipping")
+        return 0
+    
+    url = ""
+    print("Downloading", name, "...")
+    for i in range(3):
+        try:
+            url = yt_query(name)[0]
+            break
+        except:
+            print("No YT Queries Found")
+            if i < 2:
+                print("Trying again")
+            else:
+                print("Sorry, can't seem to download this...")
+            pass
+
+    if url != "":
+        yt_url_download(url, name=name)
+
+# Returns URL of Song
+def yt_query(name):
+    query = urllib.parse.quote(name)
+    url = "https://www.youtube.com/results?search_query=" + query
+    response = urllib.request.urlopen(url)
+    html = response.read()
+    soup = BeautifulSoup(html, 'html.parser')
+
+    urls = []
+    #print("possible links:")
+    for vid in soup.findAll(attrs={'class':'yt-uix-tile-link'}):
+        urls.append('https://www.youtube.com' + vid['href'])
+        #print('     https://www.youtube.com' + vid['href'])
+    return urls
+
+
+# Helper Function for Progress Bar
+def progress_Check(stream = None, chunk = None, remaining = None):
+    #Gets the percentage of the file that has been downloaded.
+    percent = (100*(file_size-remaining))/file_size
+    bar.update(percent)
+    # print("{:00.0f}% downloaded".format(percent))
+
+# --- Function to Download a Video URL ---
+def yt_url_download(url, name=""):
+    # Global Variables to Modify
+    global failed_downloads
+    global file_size # For Progress Bar
+    global bar       # For Progress Bar
+
+    start_time = time.time()
+    print("URL: ", url)
+    yt = YouTube(url, on_progress_callback=progress_Check)
+
+    # Choosing Stream
+    if (audio_only):
+        stream = yt.streams.filter(only_audio=True).first()
+    else:
+        stream = yt.streams.filter(progressive = True).first()
+
+    # Get setting up file size variable for progress bar
+    file_size = stream.filesize
+
+    # Check Custom Name Setting
+    if not customname:
+        name = ""
+
+    # Downloading File
+    with progressbar.ProgressBar(max_value=100) as bar:
+        
+        success = False
+        try:
+            if name!="":
+                stream.download(vid_dir, filename=name) #save file as filename to specified dir
+            else:
+                stream.download(vid_dir)
+
+            success= True
+        except Exception as e:
+            print("Error Downloading File")
+            print("Error: " + str(e))
+            pass
+
+    # Collating Failed Videos to Try Again
+    if not success:
+        failed_downloads.append((url, name))
+
+    # Sleeping to Prevent Youtube Blockage
+    time_taken = time.time() - start_time
+    time_to_sleep = 10 - time_taken
+    if time_to_sleep > 0:
+        time.sleep(time_to_sleep)
+
+# --- Function to Download Failed Videos --- [Deprecated]
+def download_fails_fn():
+    global failed_downloads
+    if failed_downloads == []:
+       return
+    print("Trying to Download Failed Files")
+    for index, (url, name) in enumerate(failed_downloads):
+        print(index+1, "/", len(failed_downloads))
+        yt_url_download(url,name)
+    convert_vid_to_audio(vid_dir, audio_dir)
+
+#############################################################################################################################################
+## HIGH LEVEL FUNCTIONS FOR DIFFERENT INPUT TYPES [These functions call the universal youtube download functions above]
+#   
+#   spotify_download(playlist_url) [downloads songs from spotify playlist]
+#       --> spotify_import(url) [uses bs4 to get Song Names]
+#   adhoc_download(names) [handles adhoc input]
+#   csv_download(csv_filename) [handles CSV input]
+#   youtube_playlist_download(playlist_url) [handles youtube playlist download]   
+#   
+#############################################################################################################################################
+def spotify_download(playlist_url):
+    playlist = spotify_import(playlist_url)
+    
+    #print(playlist)
+    cont = input("Continue? (y/n):  ")
+    if (cont == "y"):
+        for song in playlist:
+            print("Song: ", song)
+            yt_download(song)
+
+        convert_vid_to_audio(vid_dir, audio_dir)
+    else:
+        print ("")
+        main()
+
 def spotify_import(url):
     #url = "https://open.spotify.com/user/11167406418/playlist/4sqiTOJuBd17olFPKosgTq?si=B59i-8wEQaC-HYVQF09X3Q"
     response = requests.get(url)
@@ -57,98 +211,67 @@ def spotify_import(url):
         print(tracks[i]+" - "+artists[i])
     return output
 
-######################################################################################################################################       
-# html parsing
-def yt_query(name):
-    query = urllib.parse.quote(name)
-    url = "https://www.youtube.com/results?search_query=" + query
-    response = urllib.request.urlopen(url)
-    html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
 
-    urls = []
-    #print("possible links:")
-    for vid in soup.findAll(attrs={'class':'yt-uix-tile-link'}):
-        urls.append('https://www.youtube.com' + vid['href'])
-        #print('     https://www.youtube.com' + vid['href'])
-    return urls
-
-# download each video (with first result)
-def yt_download(name):
-
-    #Check if video already downloaded
-    if os.path.isfile(vid_dir+"/"+name+".mp4"):
-        print(name, "has already been downloaded, skipping")
-        return 0
-    
-    print("Downloading", name, "...")
-    urls = yt_query(name)
-    yt_url_download(urls[0], name=name)
+def adhoc_download(names):
+    print("Downloading" , len(names), "files")
+    for name in names:
+        yt_download(name)
+    convert_vid_to_audio(vid_dir, audio_dir)
 
 
-# --- Function to Download a Video URL ---
-failed_downloads =[]
+def csv_download(csv_filename):
+    songs = [] #songs[i] = (title, artist)
+    try:
+        with open(csv_filename) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                songs.append((row[0], row[1]))
+    except Exception as e:
+        print(e)
+        print("Error Occured Reading CSV, please ensure that the file exist and is formatted properly")
+        return
 
-# Helper Function for Progress Bar
-def progress_Check(stream = None, chunk = None, remaining = None):
-    #Gets the percentage of the file that has been downloaded.
-    percent = (100*(file_size-remaining))/file_size
-    bar.update(percent)
-    # print("{:00.0f}% downloaded".format(percent))
-
-
-def yt_url_download(url, name=""):
-    # Global Variables to Modify
-    global failed_downloads
-    global file_size # For Progress Bar
-    global bar       # For Progress Bar
-
-    start_time = time.time()
-    # print("URL: ", url)
-    yt = YouTube(url, on_progress_callback=progress_Check)
-
-    # Choosing Stream
-    if (audio_only):
-        stream = yt.streams.filter(only_audio=True).first()
-    else:
-        stream = yt.streams.filter(progressive = True).first()
-
-    # Get setting up file size variable for progress bar
-    file_size = stream.filesize
-
-    # Check Custom Name Setting
-    if not customname:
-        name = ""
-
-    # Downloading File
-    with progressbar.ProgressBar(max_value=100) as bar:
+    for index, song in enumerate(songs):
+        print(index,": " + song[0])
         
-        success = False
-        try:
-            if name!="":
-                stream.download(vid_dir, filename=name) #save file as filename to specified dir
-            else:
-                stream.download(vid_dir)
+    #print(songs)
+    try:
+        for song in songs:
+            query_string = song[0] + " " + song[1]
+            yt_download(query_string)
+    except:
+        pass
+    convert_vid_to_audio(vid_dir, audio_dir)
 
-            success= True
-        except Exception as e:
-            print("Error Downloading File")
-            print("Error: " + str(e))
+
+def youtube_playlist_download(playlist_url):
+    print("---Youtube Playlist Download---")
+    playlist = Playlist(playlist_url)
+    playlist.populate_video_urls()
+    print("Number of Videos in Playlist: ", len(playlist.video_urls))
+    print(playlist.video_urls)
+    cont = input("Continue? (y/n):  ")
+    if (cont == "y"):
+        try: 
+            for index, url in enumerate(playlist.video_urls):
+                print(index+1, "/", len(playlist.video_urls))
+                yt_url_download(url)
+
+        except:
             pass
+        convert_vid_to_audio(vid_dir, audio_dir)
+    else:
+        print ("")
+        main()
 
-    # Collating Failed Videos to Try Again
-    if not success:
-        failed_downloads.append((url, name))
-
-        
-    # Sleeping to Prevent Youtube Blockage
-    time_taken = time.time() - start_time
-    time_to_sleep = 10 - time_taken
-    if time_to_sleep > 0:
-        time.sleep(time_to_sleep)
-    
-
-
+#############################################################################################################################################
+## POST PROCESSING AND OFFLINE FUNCTIONS
+#   
+#   convert_vid_to_audio(vid_dir, audio_dir) [Uses FFMPEG to Convert Songs in "vid_dir" to mp3 files in "audio_dir"]
+#   clear_temp_vid_files(vid_dir) [Deletes files in "vid_dir"]
+#   close() [Function called to invoke shutdown of programme]
+#
+#############################################################################################################################################
 #Post Processing (Convert to MP3)
 def convert_vid_to_audio(vid_dir, audio_dir):
     print("Downloads (Hopefully) Complete; Converting MP4 to MP3...")
@@ -173,24 +296,31 @@ def convert_vid_to_audio(vid_dir, audio_dir):
         ff.run()
 
 def clear_temp_vid_files(vid_dir):
-    shutil.rmtree(vid_dir)
+    shutil.rmtree(vid_dir)        
 
-def download_fails_fn():
-    
-    global failed_downloads
-    if failed_downloads == []:
-       return
-    print("Trying to Download Failed Files")
-    for index, (url, name) in enumerate(failed_downloads):
-        print(index+1, "/", len(failed_downloads))
-        yt_url_download(url,name)
-    convert_vid_to_audio(vid_dir, audio_dir)
-        
+def close():
+    print("")
+    print("************************************************************")
+    if os.listdir(vid_dir) == []: #if user hasnt downloaded anything, dont quit
+        main()
+    print("All pending operations complete, songs stored in mp3 folder.")
+    exiting = input("Would you like to exit this program? (y/n?): ")
+    if(exiting == "n" or exiting ==""):
+        print("")
+        main()
+    else:
+        clear_temp_vid_files(vid_dir)
+        sys.exit() #to prevent multiple queries
 
-    
+#############################################################################################################################################
+## CLI AND FRONT-END FUNCTIONS
+#   
+#   presets() [sets predefined global variables]
+#   settings() [Called upon need to edit settings from CLI]
+#   main() [Function called to invoke programme]
+#
+#############################################################################################################################################
 
-###################################################################################################################################
-# MAIN
 def presets():
     global vid_dir
     global audio_dir
@@ -206,8 +336,8 @@ def presets():
         os.mkdir(vid_dir) #create vid_dir if it doesnt already exist
     except:
         pass
-
 presets()
+
 
 def settings():
     global vid_dir
@@ -243,9 +373,6 @@ def settings():
     except:
         pass
 
-    
-
-        
 def main():
     print("Options")
     print("|  a ----- Ad-Hoc (Default)")
@@ -323,93 +450,7 @@ def main():
         download_fails_fn()
     
     close()
-
-def adhoc_download(names):
-    print("Downloading" , len(names), "files")
-    for name in names:
-        yt_download(name)
-    convert_vid_to_audio(vid_dir, audio_dir)
-
-
-def spotify_download(playlist_url):
-    playlist = spotify_import(playlist_url)
     
-    #print(playlist)
-    cont = input("Continue? (y/n):  ")
-    if (cont == "y"):
-        try:
-            for song in playlist:
-                yt_download(song)
-        except:
-            pass
-        convert_vid_to_audio(vid_dir, audio_dir)
-    else:
-        print ("")
-        main()
-
-
-def csv_download(csv_filename):
-    songs = [] #songs[i] = (title, artist)
-    try:
-        with open(csv_filename) as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            for row in csv_reader:
-                songs.append((row[0], row[1]))
-    except Exception as e:
-        print(e)
-        print("Error Occured Reading CSV, please ensure that the file exist and is formatted properly")
-        return
-
-    for index, song in enumerate(songs):
-        print(index,": " + song[0])
-        
-    #print(songs)
-    try:
-        for song in songs:
-            query_string = song[0] + " " + song[1]
-            yt_download(query_string)
-    except:
-        pass
-    convert_vid_to_audio(vid_dir, audio_dir)
-
-
-def youtube_playlist_download(playlist_url):
-    print("---Youtube Playlist Download---")
-    playlist = Playlist(playlist_url)
-    playlist.populate_video_urls()
-    print("Number of Videos in Playlist: ", len(playlist.video_urls))
-    print(playlist.video_urls)
-    cont = input("Continue? (y/n):  ")
-    if (cont == "y"):
-        try: 
-            for index, url in enumerate(playlist.video_urls):
-                print(index+1, "/", len(playlist.video_urls))
-                yt_url_download(url)
-
-        except:
-            pass
-        convert_vid_to_audio(vid_dir, audio_dir)
-    else:
-        print ("")
-        main()
-    
-def close():
-    print("")
-    print("************************************************************")
-    if os.listdir(vid_dir) == []: #if user hasnt downloaded anything, dont quit
-        main()
-    print("All pending operations complete, songs stored in mp3 folder.")
-    exiting = input("Would you like to exit this program? (y/n?): ")
-    if(exiting == "n" or exiting ==""):
-        print("")
-        main()
-    else:
-        clear_temp_vid_files(vid_dir)
-        sys.exit() #to prevent multiple queries
-
-
-    
-#Autorun Main Function
+# Autorun Main Function
 if __name__ == '__main__':
     main()
-
