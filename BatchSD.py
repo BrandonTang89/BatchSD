@@ -177,8 +177,11 @@ def spotify_download(playlist_url):
 
 def spotify_import(url):
     #url = "https://open.spotify.com/user/11167406418/playlist/4sqiTOJuBd17olFPKosgTq?si=B59i-8wEQaC-HYVQF09X3Q"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text,"html.parser")
+    #response = requests.get(url)
+
+    response = urllib.request.urlopen(url)
+    html = response.read()
+    soup = BeautifulSoup(html,"html.parser")
 
     #name array
     tracks = soup.findAll("span", { "class" : "track-name" })
