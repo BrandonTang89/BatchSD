@@ -177,9 +177,9 @@ def spotify_download(playlist_url):
 
 def spotify_import(url):
     #url = "https://open.spotify.com/user/11167406418/playlist/4sqiTOJuBd17olFPKosgTq?si=B59i-8wEQaC-HYVQF09X3Q"
-    #response = requests.get(url)
 
-    response = urllib.request.urlopen(url)
+    req = urllib.request.Request(url,headers={'User-Agent': 'Mozilla/5.0'})
+    response = urllib.request.urlopen(req)
     html = response.read()
     soup = BeautifulSoup(html,"html.parser")
 
@@ -208,7 +208,7 @@ def spotify_import(url):
             if(j < len(artists[i])-2): temp += ", "
         artists[i] = temp
 
-    print("tracks and artists")
+    print("tracks and artists | Total Songs: " + str(len(tracks)))
     output = []
     for i in range(len(tracks)):
         output.append(tracks[i]+" - "+artists[i])
