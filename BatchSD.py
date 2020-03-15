@@ -11,6 +11,7 @@
 #############################################################################################################################################
 
 import os, sys, shutil, csv, time
+from multiprocessing import Pool
 import requests, urllib.request
 import ffmpy3, progressbar
 from bs4 import BeautifulSoup
@@ -159,6 +160,17 @@ def download_fails_fn():
 #   youtube_playlist_download(playlist_url) [handles youtube playlist download]   
 #   
 #############################################################################################################################################
+def multiprocessing_download(name_list):
+    num_processes = 4
+    with Pool(processes=num_processes) as pool:
+        start = 0
+        end = min(num_processes+1, len(name_list))
+        while end <= len(name_list):
+            pool.map(yt_download, name_list[start:end])
+            end += num_processes
+            start += num_processes
+
+    return 0
 def spotify_download(playlist_url):
     playlist = spotify_import(playlist_url)
     
