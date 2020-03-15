@@ -15,7 +15,6 @@ import sys
 import shutil
 import csv
 import time
-import requests
 import urllib.request
 import ffmpy3
 import progressbar
