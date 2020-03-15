@@ -15,7 +15,7 @@ The list of songs can be inputted in 4 different ways
 More detailed instructions are found in "readme.txt" which is shown at the bottom of the page
 
 ## About and Technical Details
-This programme was jointly developed by Brandon Tang and Reiden Ong to enable the masses to more conveniently download songs from youtube. It relies on the pytube library and uses FFMPEG to convert the downloaded MP4 files into MP3 format.
+This programme was initially developed Reiden Ong and then taken over by Brandon Tang. Its main aim is to enable the masses to more conveniently download songs from youtube. BatchSD relies on the pytube library and uses FFMPEG to convert the downloaded MP4 files into MP3 format.
 
 ### Installing Dependencies
 - Install python 3.7+ from "https://www.python.org/"
